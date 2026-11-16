@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,232 +6,453 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>加班计时器</title>
 <style>
-  :root{
-    --bg:#0f1218;--card:#1a1f2a;--card2:#232a38;--text:#e8ecf3;--muted:#8b93a7;
-    --accent:#f59e0b;--accent2:#38bdf8;--green:#22c55e;--red:#ef4444;--border:#2e3545;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    background:var(--bg);color:var(--text);min-height:100vh;
-    display:flex;align-items:center;justify-content:center;padding:16px;
-  }
-  .wrap{width:100%;max-width:460px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px 22px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
-  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-  .title{font-size:17px;font-weight:600;letter-spacing:.5px}
-  .badge{font-size:12px;padding:5px 12px;border-radius:999px;background:var(--card2);color:var(--muted)}
-  .badge.active{background:rgba(245,158,11,.16);color:var(--accent)}
-  .badge.wait{background:rgba(56,189,248,.13);color:var(--accent2)}
-
-  .time-block{text-align:center;margin:18px 0 6px}
-  .label{font-size:12.5px;color:var(--muted);margin-bottom:10px}
-  .big{font-size:50px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1.1}
-  .sub{font-size:12.5px;color:var(--muted);margin-top:8px}
-
-  .bar{height:6px;background:var(--card2);border-radius:999px;overflow:hidden;margin:18px 0 4px}
-  .bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#fbbf24,#f59e0b);transition:width .4s linear}
-
-  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin:20px 0 16px}
-  .stat{background:var(--card2);border-radius:14px;padding:13px 8px;text-align:center}
-  .stat .num{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
-  .stat .name{font-size:11px;color:var(--muted);margin-top:4px}
-
-  .meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);padding:11px 2px;border-top:1px solid var(--border)}
-  .meta span{color:var(--text);font-variant-numeric:tabular-nums}
-
-  .controls{display:flex;gap:9px;margin-top:16px}
-  button{flex:1;padding:12px;border:none;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--card2);color:var(--text)}
-  button:active{opacity:.8}
-  button.primary{background:var(--accent);color:#1a1f2a}
-  button.danger{background:rgba(239,68,68,.14);color:var(--red)}
-
-  .setting{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:12.5px;color:var(--muted)}
-  .setting input{width:44px;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 6px;text-align:center;font-size:13px;font-variant-numeric:tabular-nums}
-  .setting input:focus{outline:none;border-color:var(--accent)}
-
-  .note{margin-top:12px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.6}
+:root{
+--bg:#0f1218;--card:#1a1f2a;--card2:#232a38;
+--text:#e8ecf3;--muted:#8b93a7;
+--accent:#f59e0b;--accent2:#38bdf8;
+--green:#22c55e;--red:#ef4444;--border:#2e3545;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+background:var(--bg);color:var(--text);
+min-height:100vh;display:flex;align-items:center;
+justify-content:center;padding:16px;
+}
+.wrap{width:100%;max-width:460px}
+.card{
+background:var(--card);border:1px solid var(--border);
+border-radius:20px;padding:24px 22px;
+box-shadow:0 20px 60px rgba(0,0,0,.45)
+}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.title{font-size:17px;font-weight:600}
+.badge{font-size:12px;padding:5px 12px;border-radius:999px;background:var(--card2);color:var(--muted)}
+.badge.active{background:rgba(245,158,11,.16);color:var(--accent)}
+.badge.wait{background:rgba(56,189,248,.13);color:var(--accent2)}
+.time-block{text-align:center;margin:18px 0 6px}
+.label{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.big{font-size:50px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1.1}
+.sub{font-size:12.5px;color:var(--muted);margin-top:8px}
+.bar{height:6px;background:var(--card2);border-radius:999px;overflow:hidden;margin:18px 0 4px}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin:20px 0 16px}
+.stat{background:var(--card2);border-radius:14px;padding:13px 8px;text-align:center}
+.stat .num{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .name{font-size:11px;color:var(--muted);margin-top:4px}
+.meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);padding:11px 2px;border-top:1px solid var(--border)}
+.meta span{color:var(--text);font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:9px;margin-top:16px}
+button{flex:1;padding:12px;border:none;border-radius:12px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--card2);color:var(--text)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.primary{background:var(--accent);color:#1a1f2a}
+button.danger{background:rgba(239,68,68,.14);color:var(--red)}
+.setting{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.setting input,.query input{
+background:var(--card2);border:1px solid var(--border);
+color:var(--text);border-radius:8px;padding:7px;
+font-size:13px;
+}
+.setting input{width:48px;text-align:center}
+.query{
+margin-top:22px;padding-top:18px;border-top:1px solid var(--border)
+}
+.query-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.query-row{display:flex;gap:8px}
+.query input{flex:1;min-width:0}
+.query button{flex:0 0 85px;background:var(--accent);color:#1a1f2a;padding:9px}
+.result{
+margin-top:12px;background:var(--card2);
+border-radius:12px;padding:14px;
+display:flex;justify-content:space-between;align-items:center;
+}
+.result .name{font-size:12px;color:var(--muted)}
+.result .value{font-size:20px;font-weight:700;color:var(--accent)}
+.note{margin-top:14px;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.7}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <div class="header">
-      <div class="title">加班计时</div>
-      <div class="badge wait" id="badge">等待开始</div>
-    </div>
+<div class="card">
 
-    <div class="time-block">
-      <div class="label" id="label">距离 16:00</div>
-      <div class="big" id="display">00:00:00</div>
-      <div class="sub" id="sub"></div>
-    </div>
+<div class="header">
+<div class="title">加班计时</div>
+<div class="badge wait" id="badge">等待开始</div>
+</div>
 
-    <div class="bar"><i id="barFill"></i></div>
+<div class="time-block">
+<div class="label" id="label">距离 16:00</div>
+<div class="big" id="display">00:00:00</div>
+<div class="sub" id="sub"></div>
+</div>
 
-    <div class="stats">
-      <div class="stat"><div class="num" id="todayOvertime">0.00</div><div class="name">今日加班(小时)</div></div>
-      <div class="stat"><div class="num" id="totalOvertime">0.00</div><div class="name">累计加班(小时)</div></div>
-      <div class="stat"><div class="num" id="dayCount">0</div><div class="name">记录天数</div></div>
-    </div>
+<div class="bar"><i id="barFill"></i></div>
 
-    <div class="meta">
-      <div>当前 <span id="nowTime">--:--:--</span></div>
-      <div><span id="nowDate">----/--/--</span></div>
-    </div>
+<div class="stats">
+<div class="stat">
+<div class="num" id="todayOvertime">0.00</div>
+<div class="name">今日加班(小时)</div>
+</div>
+<div class="stat">
+<div class="num" id="totalOvertime">0.00</div>
+<div class="name">累计加班(小时)</div>
+</div>
+<div class="stat">
+<div class="num" id="dayCount">0</div>
+<div class="name">记录天数</div>
+</div>
+</div>
 
-    <div class="controls">
-      <button class="primary" id="stopBtn">结束今日加班</button>
-      <button class="danger" id="resetBtn">清零统计</button>
-    </div>
+<div class="meta">
+<div>当前 <span id="nowTime">--:--:--</span></div>
+<div><span id="nowDate">----/--/--</span></div>
+</div>
 
-    <div class="setting">
-      开始时间 <input id="hourInput" type="number" min="0" max="23" step="1" value="16"> 点整
-    </div>
+<div class="controls">
+<button class="primary" id="stopBtn">结束今日加班</button>
+<button class="danger" id="resetBtn">清零统计</button>
+</div>
 
-    <div class="note">按本机时钟计算：到设定时间自动开始计时，关掉页面再打开会接着算。</div>
-  </div>
+<div class="setting">
+开始时间
+<input id="hourInput" type="number" min="0" max="23" value="16">
+点整
+</div>
+
+<!-- 每日查询 -->
+<div class="query">
+<div class="query-title">📅 每日加班记录查询</div>
+<div class="query-row">
+<input type="date" id="queryDate">
+<button id="queryBtn">查询记录</button>
+</div>
+<div class="result">
+<div>
+<div class="name" id="queryName">选择日期查看记录</div>
+<div class="name" id="queryStatus" style="margin-top:6px">等待查询</div>
+</div>
+<div class="value" id="queryValue">0.00 小时</div>
+</div>
+</div>
+
+<div class="note">
+按本机时钟自动计时。结束加班后自动永久保存当天记录。<br>
+关闭页面或重新打开，不会影响已结束的记录。<br>
+记录保存在当前浏览器本地，请勿清除浏览器网站数据。
+</div>
+
+</div>
 </div>
 
 <script>
 (function(){
-  var KEY = "overtime-timer-v2";
 
-  // state = { hour:16, stops:{"2026-11-16": 秒时间戳}, history:{"YYYY-MM-DD": 秒数} }
-  var state = load();
+const KEY = "overtime-timer-v3";
 
-  var display   = document.getElementById("display");
-  var badge     = document.getElementById("badge");
-  var label     = document.getElementById("label");
-  var sub       = document.getElementById("sub");
-  var barFill   = document.getElementById("barFill");
-  var tOvertime = document.getElementById("todayOvertime");
-  var allOvertime = document.getElementById("totalOvertime");
-  var dayCount  = document.getElementById("dayCount");
-  var nowTime   = document.getElementById("nowTime");
-  var nowDate   = document.getElementById("nowDate");
-  var stopBtn   = document.getElementById("stopBtn");
-  var resetBtn  = document.getElementById("resetBtn");
-  var hourInput = document.getElementById("hourInput");
+function load(){
+try{
+const data = JSON.parse(localStorage.getItem(KEY));
+if(data){
+data.hour = typeof data.hour === "number" ? data.hour : 16;
+data.history = data.history || {};
+data.stops = data.stops || {};
+return data;
+}
+}catch(e){}
+return {hour:16,history:{},stops:{}};
+}
 
-  function load(){
-    try{
-      var raw = localStorage.getItem(KEY);
-      if(raw){
-        var o = JSON.parse(raw);
-        o.stops = o.stops || {};
-        o.history = o.history || {};
-        if(typeof o.hour !== "number") o.hour = 16;
-        return o;
-      }
-    }catch(e){}
-    return { hour:16, stops:{}, history:{} };
-  }
-  function save(){
-    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
-  }
-  function pad(n){ return String(n).padStart(2,"0"); }
-  function dateKey(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
-  function formatHMS(sec){
-    sec = Math.max(0, Math.floor(sec));
-    return pad(Math.floor(sec/3600))+":"+pad(Math.floor(sec%3600/60))+":"+pad(sec%60);
-  }
+let state = load();
 
-  // 今天 16:00（按设定小时）的时间戳
-  function startOfDay(d){
-    var t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    t.setHours(state.hour,0,0,0);
-    return t;
-  }
+const $ = id => document.getElementById(id);
 
-  function render(){
-    var now = new Date();
-    var key = dateKey(now);
-    nowTime.textContent = pad(now.getHours())+":"+pad(now.getMinutes())+":"+pad(now.getSeconds());
-    nowDate.textContent = now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+const pad = n => String(n).padStart(2,"0");
 
-    var start = startOfDay(now);
-    var stopTs = state.stops[key] || null;
+function dateKey(d){
+return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
 
-    var todaySec = 0;
-    if(stopTs){
-      todaySec = Math.max(0, Math.round((stopTs - start.getTime())/1000));
-    }else if(now >= start){
-      todaySec = Math.round((now - start)/1000);
-    }
+function formatHMS(sec){
+sec = Math.max(0,Math.floor(sec));
+return pad(Math.floor(sec/3600))+":"+
+pad(Math.floor(sec%3600/60))+":"+
+pad(sec%60);
+}
 
-    // 实时写入历史，作为"今日/累计"数据源
-    state.history[key] = todaySec;
-    save();
+function startOfDay(d){
+return new Date(
+d.getFullYear(),d.getMonth(),d.getDate(),
+state.hour,0,0,0
+);
+}
 
-    if(stopTs){
-      badge.textContent = "今日已结束";
-      badge.className = "badge";
-      label.textContent = "今日加班时长";
-      display.textContent = formatHMS(todaySec);
-      sub.textContent = "结束于 " + pad(new Date(stopTs).getHours()) + ":" + pad(new Date(stopTs).getMinutes());
-      barFill.style.width = "100%";
-    }else if(now >= start){
-      badge.textContent = "加班中";
-      badge.className = "badge active";
-      label.textContent = "今日已加班";
-      display.textContent = formatHMS(todaySec);
-      sub.textContent = "开始于 " + pad(state.hour) + ":00";
-      // 进度条：以 8 小时为满格
-      barFill.style.width = Math.min(100, todaySec/28800*100) + "%";
-    }else{
-      badge.textContent = "等待开始";
-      badge.className = "badge wait";
-      label.textContent = "距离 " + pad(state.hour) + ":00 还有";
-      display.textContent = formatHMS(Math.round((start - now)/1000));
-      sub.textContent = "到点自动计时";
-      barFill.style.width = "0%";
-    }
+function save(){
+localStorage.setItem(KEY,JSON.stringify(state));
+}
 
-    tOvertime.textContent = (todaySec/3600).toFixed(2);
+// 获取某天已经保存的加班秒数
+function getSavedSeconds(key){
+return Math.max(0,Number(state.history[key]) || 0);
+}
 
-    var total = 0, days = 0;
-    for(var k in state.history){
-      if(state.history[k] > 0){ total += state.history[k]; days++; }
-    }
-    allOvertime.textContent = (total/3600).toFixed(2);
-    dayCount.textContent = days;
-  }
+// 当前日期加班秒数
+function getTodaySeconds(now){
+const key = dateKey(now);
 
-  stopBtn.addEventListener("click", function(){
-    var now = new Date();
-    var key = dateKey(now);
-    var start = startOfDay(now);
-    if(now < start){ alert("还没到 " + pad(state.hour) + ":00，无法结束。"); return; }
-    if(state.stops[key]){ // 再次点击 = 取消结束，继续计时
-      delete state.stops[key];
-    }else{
-      state.stops[key] = now.getTime();
-    }
-    save();
-    render();
-  });
+if(state.stops[key]){
+return getSavedSeconds(key);
+}
 
-  resetBtn.addEventListener("click", function(){
-    if(confirm("确定清空所有加班记录？")){
-      state = { hour: state.hour, stops:{}, history:{} };
-      save();
-      render();
-    }
-  });
+const start = startOfDay(now);
 
-  hourInput.addEventListener("change", function(){
-    var v = parseInt(hourInput.value, 10);
-    if(isNaN(v) || v < 0 || v > 23){ hourInput.value = state.hour; return; }
-    state.hour = v;
-    hourInput.value = v;
-    save();
-    render();
-  });
-  hourInput.value = state.hour;
+if(now < start) return 0;
 
-  render();
-  setInterval(render, 1000);
+return Math.max(0,Math.floor((now-start)/1000));
+}
+
+// 累计统计
+function updateStats(todaySec){
+$("todayOvertime").textContent =
+(todaySec/3600).toFixed(2);
+
+let total = 0;
+let days = 0;
+
+for(const key in state.history){
+const sec = getSavedSeconds(key);
+if(sec > 0){
+total += sec;
+days++;
+}
+}
+
+$("totalOvertime").textContent =
+(total/3600).toFixed(2);
+
+$("dayCount").textContent = days;
+}
+
+// 主界面
+function render(){
+
+const now = new Date();
+const key = dateKey(now);
+const start = startOfDay(now);
+
+$("nowTime").textContent =
+pad(now.getHours())+":"+
+pad(now.getMinutes())+":"+
+pad(now.getSeconds());
+
+$("nowDate").textContent =
+key.replace(/-/g,"/");
+
+const todaySec = getTodaySeconds(now);
+
+if(state.stops[key]){
+
+$("badge").textContent = "今日已结束";
+$("badge").className = "badge";
+
+$("label").textContent = "今日加班时长";
+$("display").textContent = formatHMS(todaySec);
+
+const stopTime = new Date(state.stops[key]);
+
+$("sub").textContent =
+"结束于 "+pad(stopTime.getHours())+":"+
+pad(stopTime.getMinutes());
+
+$("barFill").style.width = "100%";
+
+$("stopBtn").textContent = "今日已结束";
+$("stopBtn").disabled = true;
+
+}else if(now >= start){
+
+$("badge").textContent = "加班中";
+$("badge").className = "badge active";
+
+$("label").textContent = "今日已加班";
+$("display").textContent = formatHMS(todaySec);
+
+$("sub").textContent =
+"开始于 "+pad(state.hour)+":00";
+
+$("barFill").style.width =
+Math.min(100,todaySec/28800*100)+"%";
+
+$("stopBtn").textContent = "结束今日加班";
+$("stopBtn").disabled = false;
+
+}else{
+
+$("badge").textContent = "等待开始";
+$("badge").className = "badge wait";
+
+$("label").textContent =
+"距离 "+pad(state.hour)+":00 还有";
+
+$("display").textContent =
+formatHMS(Math.floor((start-now)/1000));
+
+$("sub").textContent = "到点自动计时";
+
+$("barFill").style.width = "0%";
+
+$("stopBtn").textContent = "结束今日加班";
+$("stopBtn").disabled = false;
+}
+
+// 只实时更新尚未结束的当天记录
+if(!state.stops[key]){
+state.history[key] = todaySec;
+save();
+}
+
+updateStats(todaySec);
+}
+
+// 结束当天加班：保存最终秒数及结束时间
+$("stopBtn").addEventListener("click",function(){
+
+const now = new Date();
+const key = dateKey(now);
+const start = startOfDay(now);
+
+if(now < start){
+alert("还没到 "+pad(state.hour)+":00，无法结束。");
+return;
+}
+
+if(state.stops[key]) return;
+
+const seconds = Math.max(
+0,Math.floor((now-start)/1000)
+);
+
+// 固定保存，不再随时间变化
+state.history[key] = seconds;
+state.stops[key] = now.getTime();
+
+save();
+render();
+
+alert("今日加班记录已保存！");
+
+});
+
+// 清空统计
+$("resetBtn").addEventListener("click",function(){
+
+if(confirm("确定清空所有加班记录？此操作不可恢复！")){
+
+state.history = {};
+state.stops = {};
+
+save();
+render();
+
+$("queryValue").textContent = "0.00 小时";
+$("queryStatus").textContent = "记录已清空";
+
+}
+
+});
+
+// 修改开始时间
+$("hourInput").addEventListener("change",function(){
+
+const v = parseInt(this.value,10);
+
+if(isNaN(v)||v<0||v>23){
+this.value = state.hour;
+return;
+}
+
+if(!confirm("修改开始时间可能影响尚未结束的当天计时，是否继续？")){
+this.value = state.hour;
+return;
+}
+
+state.hour = v;
+save();
+render();
+
+});
+
+$("hourInput").value = state.hour;
+
+// 每日查询
+function queryDay(){
+
+const key = $("queryDate").value;
+
+if(!key){
+alert("请先选择查询日期！");
+return;
+}
+
+const today = dateKey(new Date());
+
+$("queryName").textContent = key;
+
+if(state.stops[key]){
+
+const seconds = getSavedSeconds(key);
+
+$("queryValue").textContent =
+(seconds/3600).toFixed(2)+" 小时";
+
+$("queryStatus").textContent =
+"已结束 · 记录已保存";
+
+}else if(key === today){
+
+const now = new Date();
+const seconds = getTodaySeconds(now);
+
+$("queryValue").textContent =
+(seconds/3600).toFixed(2)+" 小时";
+
+$("queryStatus").textContent =
+seconds > 0 ? "正在加班 · 实时记录" : "尚未开始加班";
+
+}else if(state.history[key] !== undefined){
+
+const seconds = getSavedSeconds(key);
+
+$("queryValue").textContent =
+(seconds/3600).toFixed(2)+" 小时";
+
+$("queryStatus").textContent =
+"历史记录";
+
+}else{
+
+$("queryValue").textContent = "0.00 小时";
+$("queryStatus").textContent = "没有加班记录";
+
+}
+
+}
+
+$("queryBtn").addEventListener("click",queryDay);
+
+$("queryDate").value = dateKey(new Date());
+
+render();
+queryDay();
+
+setInterval(function(){
+render();
+
+// 如果查询的是今天，查询结果也同步更新
+if($("queryDate").value === dateKey(new Date())){
+queryDay();
+}
+},1000);
+
 })();
 </script>
 </body>
